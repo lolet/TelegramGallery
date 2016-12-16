@@ -5,7 +5,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Build;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -39,9 +41,9 @@ public class PhotoAlbumPickerActivity extends BaseFragment
 
 
     public interface PhotoAlbumPickerActivityDelegate {
-        void didSelectPhotos(ArrayList<String> photos, ArrayList<String> captions);
+        void didSelectPhotos(ArrayList<Uri> photos);
 
-        boolean didSelectVideo(String path);
+        boolean didSelectVideo(Uri path);
 
         void startPhotoSelectActivity();
     }
@@ -486,18 +488,14 @@ public class PhotoAlbumPickerActivity extends BaseFragment
         }
         fillSelectedPhotosSortEnd();
         sendPressed = true;
-        ArrayList<String> photos = new ArrayList<>();
-        ArrayList<String> captions = new ArrayList<>();
+        ArrayList<Uri> photos = new ArrayList<>();
+        final Uri content = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
         for (MediaController.PhotoEntry photoEntry : selectedPhotosSortEnd) {
-            if (photoEntry.imagePath != null) {
-                photos.add(photoEntry.imagePath);
-                captions.add(photoEntry.caption != null ? photoEntry.caption.toString() : null);
-            } else if (photoEntry.path != null) {
-                photos.add(photoEntry.path);
-                captions.add(photoEntry.caption != null ? photoEntry.caption.toString() : null);
-            }
+            Uri photoUri = content.buildUpon().appendPath(Integer.toString(photoEntry.imageId))
+                    .build();
+            photos.add(photoUri);
         }
-        delegate.didSelectPhotos(photos, captions);
+        delegate.didSelectPhotos(photos);
     }
 
     private void fixLayout() {
@@ -574,7 +572,7 @@ public class PhotoAlbumPickerActivity extends BaseFragment
                     }
 
                     @Override
-                    public boolean didSelectVideo(String path) {
+                    public boolean didSelectVideo(Uri path) {
                         removeSelfFromStack();
                         return delegate.didSelectVideo(path);
                     }

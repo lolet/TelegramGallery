@@ -6,6 +6,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -51,7 +53,7 @@ public class PhotoPickerActivity extends BaseFragment
 
         void actionButtonPressed(boolean canceled);
 
-        boolean didSelectVideo(String path);
+        boolean didSelectVideo(Uri path);
 
         int getCheckboxTag(int imageId);
 
@@ -203,7 +205,12 @@ public class PhotoPickerActivity extends BaseFragment
                     if (i < 0 || i >= selectedAlbum.photos.size()) {
                         return;
                     }
-                    if (delegate.didSelectVideo(selectedAlbum.photos.get(i).path)) {
+
+                    final Uri content = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                    Uri photoUri = content.buildUpon().appendPath(Integer.toString(selectedAlbum.photos.get(i).imageId))
+                                .build();
+
+                    if (delegate.didSelectVideo(photoUri)) {
                         finishFragment();
                     }
                 } else {

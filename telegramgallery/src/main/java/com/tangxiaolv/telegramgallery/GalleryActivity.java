@@ -4,6 +4,7 @@ package com.tangxiaolv.telegramgallery;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -77,14 +78,14 @@ public class GalleryActivity extends Activity implements ActionBarLayout.ActionB
 
     private PhotoAlbumPickerActivity.PhotoAlbumPickerActivityDelegate mPhotoAlbumPickerActivityDelegate = new PhotoAlbumPickerActivity.PhotoAlbumPickerActivityDelegate() {
         @Override
-        public void didSelectPhotos(ArrayList<String> photos, ArrayList<String> captions) {
+        public void didSelectPhotos(ArrayList<Uri> photos) {
             Intent intent = new Intent();
             intent.putExtra(PHOTOS, photos);
             setResult(Activity.RESULT_OK, intent);
         }
 
         @Override
-        public boolean didSelectVideo(String path) {
+        public boolean didSelectVideo(Uri path) {
             Intent intent = new Intent();
             intent.putExtra(VIDEO, path);
             setResult(Activity.RESULT_OK, intent);

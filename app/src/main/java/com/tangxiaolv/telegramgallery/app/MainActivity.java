@@ -5,7 +5,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,11 +19,14 @@ import android.widget.ImageView;
 import com.tangxiaolv.telegramgallery.GalleryActivity;
 import com.tangxiaolv.telegramgallery.GalleryConfig;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private List<String> photos;
+    private List<Uri> photos;
     private BaseAdapter adapter;
     private int reqCode = 12;
 
@@ -58,12 +63,25 @@ public class MainActivity extends AppCompatActivity {
                 view.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 view.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                         256));
-                String path = (String) getItem(position);
-                BitmapFactory.Options opts = new BitmapFactory.Options();
-                opts.inPreferredConfig = Bitmap.Config.ARGB_4444;
-                opts.inSampleSize = 4;
-                Bitmap bitmap = BitmapFactory.decodeFile(path, opts);
-                view.setImageBitmap(bitmap);
+
+                try {
+                    Uri path = (Uri) getItem(position);
+                    InputStream input = getContentResolver().openInputStream(path);
+                    BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+                    bitmapOptions.inSampleSize = 4;
+                    bitmapOptions.inPreferredConfig=Bitmap.Config.ARGB_4444;
+
+                    Bitmap bitmap = BitmapFactory.decodeStream(input, null, bitmapOptions);
+                    input.close();
+
+                    view.setImageBitmap(bitmap);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
                 return view;
             }
         });
@@ -96,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (12 == requestCode && resultCode == Activity.RESULT_OK) {
-            photos = (List<String>) data.getSerializableExtra(GalleryActivity.PHOTOS);
+            photos = (List<Uri>) data.getSerializableExtra(GalleryActivity.PHOTOS);
             adapter.notifyDataSetChanged();
         }
     }

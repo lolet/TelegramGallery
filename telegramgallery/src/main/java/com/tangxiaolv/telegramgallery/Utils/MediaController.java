@@ -148,7 +148,6 @@ public class MediaController implements NotificationCenter.NotificationCenterDel
     public int roamingDownloadMask = 0;
 
     private Runnable refreshGalleryRunnable;
-    public static AlbumEntry allPhotosAlbumEntry;
 
     private HashMap<String, ArrayList<WeakReference<FileDownloadProgressListener>>> loadingFileObservers = new HashMap<>();
     private HashMap<Integer, String> observersByTag = new HashMap<>();
@@ -708,11 +707,9 @@ public class MediaController implements NotificationCenter.NotificationCenterDel
 
                 final Integer cameraAlbumIdFinal = cameraAlbumId;
                 final Integer cameraAlbumVideoIdFinal = cameraAlbumVideoId;
-                final AlbumEntry allPhotosAlbumFinal = allPhotosAlbum;
                 AndroidUtilities.runOnUIThread(new Runnable() {
                     @Override
                     public void run() {
-                        allPhotosAlbumEntry = allPhotosAlbumFinal;
                         NotificationCenter.getInstance().postNotificationName(
                                 NotificationCenter.albumsDidLoaded, guid, albumsSorted,
                                 cameraAlbumIdFinal, videoAlbumsSorted, cameraAlbumVideoIdFinal);
